@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>India Product Job Search OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F6F1E7; --card:#FFFFFF; --ink:#221D17; --ink-soft:#5B5142;
+  --teal:#1F4E49; --teal-deep:#12332F; --clay:#B5622F; --gold:#B8862F; --line:#E4DCC9;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--cream); color:var(--ink); font-family:'Inter',-apple-system,system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter-spacing:-0.01em;}
+.wrap{max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem 4rem;}
+.eyebrow{text-transform:uppercase; letter-spacing:0.12em; font-size:0.72rem; color:var(--teal); font-weight:600; margin:0 0 0.35rem;}
+.hdr{border-bottom:1px solid var(--line); padding-bottom:1.5rem; margin-bottom:2.5rem;}
+.hdr h1{font-size:2.1rem;}
+.hdr-stats{display:flex; gap:2rem; margin-top:1.25rem; flex-wrap:wrap;}
+.hstat{display:flex; flex-direction:column;}
+.hstat-n{font-family:'Fraunces',serif; font-size:1.6rem; font-weight:700; color:var(--teal-deep);}
+.hstat-l{font-size:0.78rem; color:var(--ink-soft);}
+.hdr-meta{display:flex; align-items:center; gap:0.5rem; margin-top:1.25rem; font-size:0.85rem; color:var(--ink-soft);}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-ok{background:var(--teal);} .dot-warn{background:var(--clay);}
+.hdr-refresh{margin-left:auto; opacity:0.7;}
+.section{margin-bottom:3rem;}
+.section-head{margin-bottom:1.25rem;}
+.section-head h2{font-size:1.5rem;}
+.section-note{color:var(--ink-soft); font-size:0.88rem; max-width:640px; margin-top:0.35rem;}
+.empty{color:var(--ink-soft); font-style:italic; padding:1.5rem; background:var(--card); border:1px dashed var(--line); border-radius:10px;}
+.loading, .fetcherr{color:var(--ink-soft); padding:3rem 1rem; text-align:center;}
+.fetcherr{color:#8A3B1B;}
+.fetcherr pre{white-space:pre-wrap; text-align:left; background:#fff; border:1px solid var(--line); border-radius:8px; padding:1rem; font-size:0.8rem; margin-top:1rem;}
+
+.apply-first-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;}
+.af-card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1.1rem; display:flex; flex-direction:column; gap:0.55rem;}
+.af-top{display:flex; gap:0.75rem; align-items:center;}
+.af-company{font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin:0;}
+.af-title{font-size:1.05rem; margin:0.1rem 0;}
+.af-meta{font-size:0.8rem; color:var(--ink-soft); margin:0;}
+.af-comp{font-weight:600; color:var(--teal-deep); margin:0; font-size:0.92rem;}
+.af-why,.af-watch{font-size:0.82rem; margin:0; line-height:1.4;}
+.af-watch{color:var(--clay);}
+.af-actions{display:flex; gap:0.5rem; margin-top:0.4rem;}
+.btn-detail{flex:1; background:transparent; border:1px solid var(--teal); color:var(--teal-deep); border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:600;}
+.btn-apply{flex:1; background:var(--teal); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; text-align:center; text-decoration:none; font-weight:600;}
+.ring-text{font-size:0.95rem; font-weight:700; fill:var(--ink); font-family:'Inter',sans-serif;}
+
+.new-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.75rem;}
+.compact-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0.75rem; display:flex; gap:0.7rem; align-items:center; cursor:pointer;}
+.compact-company{font-size:0.72rem; text-transform:uppercase; color:var(--ink-soft); margin:0;}
+.compact-title{font-size:0.9rem; margin:0.1rem 0 0; font-weight:600;}
+
+.filters{display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:1.1rem;}
+.chip{border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:999px; padding:0.4rem 0.85rem; font-size:0.8rem; cursor:pointer; font-family:inherit;}
+.chip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+.chip.select{padding:0.4rem 0.6rem; border-radius:8px;}
+.filter-note{font-size:0.72rem; color:var(--ink-soft); margin-left:0.25rem;}
+
+.table-row{display:grid; grid-template-columns:2.2fr 1.3fr 0.9fr 1fr 1fr 0.7fr; gap:0.75rem; align-items:center; padding:0.85rem 0; border-bottom:1px solid var(--line); cursor:pointer;}
+.table-head{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-weight:600; border-bottom:2px solid var(--ink); cursor:default;}
+.t-role{font-weight:600;}
+.t-company{font-size:0.8rem; color:var(--ink-soft);}
+.pill{display:inline-block; padding:0.18rem 0.6rem; border-radius:999px; font-size:0.72rem; font-weight:600;}
+.pill-strong{background:#DCE9E5; color:var(--teal-deep);}
+.pill-good{background:#F1E3CC; color:#7A5A1E;}
+.pill-moderate,.pill-weak,.pill-exceptional,.pill-poor{background:var(--line); color:var(--ink-soft);}
+.new-badge{background:var(--clay); color:#fff; font-size:0.65rem; padding:0.12rem 0.4rem; border-radius:6px; margin-left:0.4rem;}
+
+.runs-table{background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+.runs-row{display:grid; grid-template-columns:2fr 1fr 0.7fr 0.7fr 0.9fr 0.8fr 1fr; gap:0.5rem; padding:0.7rem 1rem; font-size:0.82rem; border-bottom:1px solid var(--line); align-items:center;}
+.runs-row:last-child{border-bottom:none;}
+.runs-head{font-size:0.7rem; text-transform:uppercase; color:var(--ink-soft); font-weight:600; letter-spacing:0.04em;}
+.runs-name{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.status-pill{padding:0.15rem 0.5rem; border-radius:999px; font-size:0.7rem; font-weight:600;}
+.status-completed{background:#DCE9E5; color:var(--teal-deep);}
+.status-failed{background:#F3D6CB; color:#8A3B1B;}
+.status-running,.status-pending{background:var(--line); color:var(--ink-soft);}
+
+.strategy-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:0.75rem;}
+.strategy-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0.9rem;}
+.strategy-card.muted{opacity:0.6;}
+.strategy-card h3{font-size:0.85rem; font-family:'Inter',sans-serif; font-weight:700; margin-bottom:0.3rem;}
+.strategy-card p{font-size:0.8rem; color:var(--ink-soft); margin:0;}
+
+.ftr{text-align:center; font-size:0.78rem; color:var(--ink-soft); padding-top:1.5rem; border-top:1px solid var(--line);}
+.refresh-btn{background:var(--teal); color:#fff; border:none; border-radius:8px; padding:0.5rem 1rem; font-size:0.82rem; cursor:pointer; font-weight:600; font-family:inherit;}
+
+.modal-backdrop{display:none; position:fixed; inset:0; background:rgba(18,15,10,0.55); z-index:50; align-items:flex-start; justify-content:center; padding:4vh 1rem; overflow-y:auto;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--card); border-radius:16px; max-width:640px; width:100%; padding:1.75rem; margin-top:2vh;}
+.modal h2{font-size:1.4rem; margin-bottom:0.2rem;}
+.modal .m-company{color:var(--ink-soft); font-size:0.9rem; margin-bottom:1rem;}
+.modal-grid{display:grid; grid-template-columns:1fr 1fr; gap:0.6rem 1.2rem; font-size:0.85rem; margin-bottom:1rem;}
+.modal-grid dt{color:var(--ink-soft); font-size:0.72rem; text-transform:uppercase;}
+.modal-grid dd{margin:0.1rem 0 0;}
+.modal-section{margin-bottom:0.9rem;}
+.modal-section h4{font-size:0.78rem; text-transform:uppercase; color:var(--ink-soft); margin:0 0 0.3rem;}
+.modal-close{float:right; background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--ink-soft);}
+.modal-actions{margin-top:1.2rem;}
+
+@media (max-width:720px){
+  .table-row{grid-template-columns:1fr; gap:0.2rem;}
+  .runs-row{grid-template-columns:1fr 1fr; row-gap:0.2rem;}
+  .modal-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading" id="loading">Loading your matches…</div>
+</div>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const API_URL = "https://ehifvraqlgqyhjgrksiy.supabase.co/functions/v1/dashboard";
+let DATA = null;
+let state = { filter: 'all', company: '', location: '', sort: 'score' };
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtRelative(iso){
+  if(!iso) return '—';
+  var then = new Date(iso).getTime();
+  if(isNaN(then)) return '—';
+  var mins = Math.round((Date.now()-then)/60000);
+  if(mins<60) return Math.max(mins,0)+'m ago';
+  var hrs = Math.round(mins/60);
+  if(hrs<48) return hrs+'h ago';
+  return Math.round(hrs/24)+'d ago';
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtComp(m){
+  if(m.salaryMin==null && m.salaryMax==null) return 'Not disclosed';
+  var cur = (m.salaryCurrency && m.salaryCurrency!=='INR') ? m.salaryCurrency+' ' : '₹';
+  if(m.salaryMin!=null && m.salaryMax!=null && m.salaryMin!==m.salaryMax) return cur+m.salaryMin+'–'+m.salaryMax+'L';
+  var v = m.salaryMax!=null ? m.salaryMax : m.salaryMin;
+  return cur+v+'L';
+}
+function pillClass(cat){ return 'pill pill-'+(cat||'moderate'); }
+
+function scoreRing(score, size){
+  size = size || 56;
+  var s = score||0, r = size/2-4, c = 2*Math.PI*r, offset = c*(1-s/100);
+  var color = s>=80 ? 'var(--teal)' : s>=60 ? 'var(--gold)' : 'var(--ink-soft)';
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" class="ring">'
+    + '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="var(--line)" stroke-width="4"/>'
+    + '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="4" stroke-dasharray="'+c+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 '+size/2+' '+size/2+')"/>'
+    + '<text x="50%" y="53%" text-anchor="middle" class="ring-text">'+s+'</text></svg>';
+}
+
+function applyFirstCard(m){
+  return '<article class="af-card"><div class="af-top">'+scoreRing(m.overallScore,60)
+    + '<div><p class="af-company">'+esc(m.company)+'</p><h3 class="af-title">'+esc(m.title)+'</h3>'
+    + '<p class="af-meta">'+esc(m.location||'Location TBC')+' · '+esc(m.workArrangement||'Mode not disclosed')+'</p></div></div>'
+    + '<p class="af-comp">'+esc(fmtComp(m))+'</p>'
+    + (m.strengths.length ? '<p class="af-why"><strong>Why it fits:</strong> '+esc(m.strengths[0])+'</p>' : '')
+    + (m.gaps.length ? '<p class="af-watch"><strong>Watch for:</strong> '+esc(m.gaps[0])+'</p>' : '')
+    + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
+    + (m.applicationUrl ? '<a class="btn-apply" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '')
+    + '</div></article>';
+}
+function compactCard(m){
+  return '<article class="compact-card" data-open="'+m.matchId+'">'+scoreRing(m.overallScore,44)
+    + '<div><p class="compact-company">'+esc(m.company)+'</p><p class="compact-title">'+esc(m.title)+'</p></div></article>';
+}
+
+function render(){
+  var d = DATA;
+  var app = document.getElementById('app');
+  var html = '';
+
+  html += '<header class="hdr"><div class="hdr-title"><p class="eyebrow">Job Search OS · India</p><h1>Product Job Search</h1></div>'
+    + '<div class="hdr-stats">'
+    + '<div class="hstat"><span class="hstat-n">'+d.activeCount+'</span><span class="hstat-l">active matches</span></div>'
+    + '<div class="hstat"><span class="hstat-n">'+d.strongCount+'</span><span class="hstat-l">strong</span></div>'
+    + '<div class="hstat"><span class="hstat-n">'+d.goodCount+'</span><span class="hstat-l">good</span></div>'
+    + '<div class="hstat"><span class="hstat-n">'+d.newCount+'</span><span class="hstat-l">new since last search</span></div>'
+    + '</div>'
+    + '<div class="hdr-meta"><span class="dot '+(d.lastRun && d.lastRun.status==='completed' ? 'dot-ok':'dot-warn')+'"></span>'
+    + '<span>'+(d.lastRun ? 'Last search '+fmtRelative(d.lastRun.createdAt)+' · '+esc(d.lastRun.status) : 'No search runs yet')+'</span>'
+    + '<button class="refresh-btn hdr-refresh" onclick="load()">Refresh</button></div></header>';
+
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Apply first</p><h2>Today\'s best five</h2>'
+    + '<p class="section-note">Ranked by stored match score, with a small presentation-only boost for hybrid work, disclosed compensation ≥ ₹35L, and postings found in the last 7 days — the stored score itself never changes.</p></div>'
+    + '<div class="apply-first-grid">' + (d.applyFirst.length ? d.applyFirst.map(applyFirstCard).join('') : '<p class="empty">No active matches yet.</p>') + '</div></section>';
+
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">New since last search</p>'
+    + '<h2>'+(d.newCount>0 ? d.newCount+' new role'+(d.newCount===1?'':'s') : 'No new roles in the latest search')+'</h2></div>'
+    + (d.newCount>0 ? '<div class="new-grid">'+d.matches.filter(function(m){return m.isNew;}).map(compactCard).join('')+'</div>'
+       : '<p class="empty">The last completed run found nothing new — the search converged. This is normal, not a failure.</p>')
+    + '</section>';
+
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">All matches</p><h2>Full list</h2></div>'
+    + '<div class="filters" id="filters">'
+    + '<button class="chip active" data-filter="all">All</button>'
+    + '<button class="chip" data-filter="strong">Strong</button>'
+    + '<button class="chip" data-filter="good">Good</button>'
+    + '<button class="chip" data-filter="hybrid">Hybrid</button>'
+    + '<button class="chip" data-filter="comp35">₹35L+</button>'
+    + '<button class="chip" data-filter="fintech">Fintech¹</button>'
+    + '<button class="chip" data-filter="ai">AI¹</button>'
+    + '<button class="chip" data-filter="new">New</button>'
+    + '<select class="chip select" id="company-filter"><option value="">All companies</option>'+d.companies.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select>'
+    + '<select class="chip select" id="location-filter"><option value="">All locations</option>'+d.locations.map(function(l){return '<option value="'+esc(l)+'">'+esc(l)+'</option>';}).join('')+'</select>'
+    + '<select class="chip select" id="sort-select"><option value="score">Sort: score</option><option value="newest">Sort: newest</option><option value="company">Sort: company</option><option value="comp">Sort: compensation</option></select>'
+    + '<span class="filter-note">¹ keyword match on company industry / title, not a verified tag</span>'
+    + '</div><div id="table-wrap"></div></section>';
+
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Search activity</p><h2>Recent runs</h2></div>'
+    + '<div class="runs-table"><div class="runs-row runs-head"><span>Run</span><span>When</span><span>Found</span><span>New</span><span>Rejected</span><span>Credits</span><span>Status</span></div>'
+    + d.runs.map(function(r){
+        return '<div class="runs-row"><span class="runs-name">'+esc(r.name)+'</span><span>'+fmtRelative(r.createdAt)+'</span>'
+          + '<span>'+r.jobsFound+'</span><span>'+r.jobsNew+'</span><span>'+(r.rejectedCount==null?'—':r.rejectedCount)+'</span>'
+          + '<span>'+(r.credits==null?'—':r.credits)+'</span><span><span class="status-pill status-'+esc(r.status)+'">'+esc(r.status)+'</span></span></div>';
+      }).join('')
+    + '</div></section>';
+
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Search strategy</p><h2>Source roster</h2></div>'
+    + '<div class="strategy-grid">'
+    + '<div class="strategy-card"><h3>Tier A · every run</h3><p>Paytm, Meesho, Razorpay, AiPrise, Cashfree, Fam</p></div>'
+    + '<div class="strategy-card"><h3>Tier B · every 1–2 weeks</h3><p>Swiggy, redBus / MakeMyTrip</p></div>'
+    + '<div class="strategy-card"><h3>Tier C · opportunistic</h3><p>ixigo, Pine Labs / Setu</p></div>'
+    + '<div class="strategy-card muted"><h3>Tier D · inactive</h3><p>Blinkit, Yatra, INDmoney, Cleartrip</p></div>'
+    + '<div class="strategy-card muted"><h3>Manual queue</h3><p>Zepto / TalentRecruit — always approval-gated</p></div>'
+    + '</div></section>';
+
+  html += '<footer class="ftr"><span>Live from Supabase — fetched fresh each time this page loads or you hit Refresh. No stored credentials in this page.</span></footer>';
+
+  app.innerHTML = html;
+
+  document.getElementById('company-filter').addEventListener('change', function(e){ state.company = e.target.value; renderTable(); });
+  document.getElementById('location-filter').addEventListener('change', function(e){ state.location = e.target.value; renderTable(); });
+  document.getElementById('sort-select').addEventListener('change', function(e){ state.sort = e.target.value; renderTable(); });
+  Array.prototype.forEach.call(document.querySelectorAll('#filters .chip[data-filter]'), function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('#filters .chip[data-filter]'), function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      state.filter = btn.getAttribute('data-filter');
+      renderTable();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function(el){
+    el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
+  });
+
+  renderTable();
+}
+
+function applyFilters(){
+  return DATA.matches.filter(function(m){
+    if(state.filter==='strong' && m.matchCategory!=='strong') return false;
+    if(state.filter==='good' && m.matchCategory!=='good') return false;
+    if(state.filter==='hybrid' && !/hybrid/i.test(m.workArrangement||'')) return false;
+    if(state.filter==='comp35'){
+      var v = m.salaryMax!=null ? m.salaryMax : m.salaryMin;
+      if(v==null || v<35) return false;
+    }
+    if(state.filter==='fintech'){
+      var hay = ((m.companyIndustry||'')+' '+m.title).toLowerCase();
+      if(!/fintech|payments|lending|credit/.test(hay)) return false;
+    }
+    if(state.filter==='ai'){
+      var hay2 = (m.title+' '+(m.skills||[]).join(' ')).toLowerCase();
+      if(hay2.indexOf('ai')===-1) return false;
+    }
+    if(state.filter==='new' && !m.isNew) return false;
+    if(state.company && m.company!==state.company) return false;
+    if(state.location && m.location!==state.location) return false;
+    return true;
+  });
+}
+function sortRows(rows){
+  var r = rows.slice();
+  if(state.sort==='score') r.sort(function(a,b){ return (b.overallScore||0)-(a.overallScore||0); });
+  if(state.sort==='newest') r.sort(function(a,b){ return new Date(b.discoveredAt||0)-new Date(a.discoveredAt||0); });
+  if(state.sort==='company') r.sort(function(a,b){ return a.company.localeCompare(b.company); });
+  if(state.sort==='comp') r.sort(function(a,b){
+    var av=a.salaryMax!=null?a.salaryMax:(a.salaryMin!=null?a.salaryMin:-1);
+    var bv=b.salaryMax!=null?b.salaryMax:(b.salaryMin!=null?b.salaryMin:-1);
+    return bv-av;
+  });
+  return r;
+}
+function renderTable(){
+  var rows = sortRows(applyFilters());
+  var wrap = document.getElementById('table-wrap');
+  var html = '<div class="table-row table-head"><span>Role</span><span>Location</span><span>Mode</span><span>Compensation</span><span>Discovered</span><span>Score</span></div>';
+  rows.forEach(function(m){
+    html += '<div class="table-row" data-open="'+m.matchId+'">'
+      + '<div><div class="t-role">'+esc(m.title)+(m.isNew?'<span class="new-badge">NEW</span>':'')+'</div><div class="t-company">'+esc(m.company)+'</div></div>'
+      + '<div>'+esc(m.location||'—')+'</div>'
+      + '<div>'+esc(m.workArrangement||'—')+'</div>'
+      + '<div>'+esc(fmtComp(m))+'</div>'
+      + '<div>'+fmtDate(m.discoveredAt)+'</div>'
+      + '<div><span class="'+pillClass(m.matchCategory)+'">'+(m.overallScore!=null?m.overallScore:'—')+'</span></div>'
+      + '</div>';
+  });
+  if(rows.length===0) html += '<p class="empty">No matches for this filter combination.</p>';
+  wrap.innerHTML = html;
+  Array.prototype.forEach.call(wrap.querySelectorAll('[data-open]'), function(el){
+    el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
+  });
+}
+
+function openModal(matchId){
+  var m = DATA.matches.filter(function(x){ return x.matchId===matchId; })[0];
+  if(!m) return;
+  var modal = document.getElementById('modal');
+  modal.innerHTML =
+    '<button class="modal-close" id="modal-close">×</button>'
+    + '<h2>'+esc(m.title)+'</h2>'
+    + '<p class="m-company">'+esc(m.company)+' · '+esc(m.location||'Location TBC')+'</p>'
+    + '<dl class="modal-grid">'
+    + '<div><dt>Work mode</dt><dd>'+esc(m.workArrangement||'Not disclosed')+'</dd></div>'
+    + '<div><dt>Compensation</dt><dd>'+esc(fmtComp(m))+'</dd></div>'
+    + '<div><dt>Match score</dt><dd>'+(m.overallScore!=null?m.overallScore:'—')+' · '+esc(m.matchCategory||'—')+'</dd></div>'
+    + '<div><dt>Experience range</dt><dd>'+(m.experienceMin!=null||m.experienceMax!=null ? (esc(m.experienceMin)+'–'+esc(m.experienceMax)+' yrs') : '—')+'</dd></div>'
+    + '<div><dt>Posted</dt><dd>'+fmtDate(m.postedAt)+'</dd></div>'
+    + '<div><dt>Discovered</dt><dd>'+fmtDate(m.discoveredAt)+'</dd></div>'
+    + '<div><dt>Source</dt><dd>'+esc(m.source||'—')+'</dd></div>'
+    + '<div><dt>Status</dt><dd>'+(m.isActive?'Active':'Inactive')+'</dd></div>'
+    + '</dl>'
+    + (m.strengths.length ? '<div class="modal-section"><h4>Why it fits</h4><p>'+m.strengths.map(esc).join(' · ')+'</p></div>' : '')
+    + (m.gaps.length ? '<div class="modal-section"><h4>Watch out for</h4><p>'+m.gaps.map(esc).join(' · ')+'</p></div>' : '')
+    + (m.explanation ? '<div class="modal-section"><h4>Explanation</h4><p>'+esc(m.explanation)+'</p></div>' : '')
+    + '<div class="modal-actions">'
+    + (m.applicationUrl ? '<a class="btn-apply" style="display:inline-block; padding:0.6rem 1.2rem;" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '<span style="color:var(--ink-soft); font-size:0.85rem;">No application link captured</span>')
+    + '</div>';
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+}
+function closeModal(){ document.getElementById('modal-backdrop').classList.remove('open'); }
+document.getElementById('modal-backdrop').addEventListener('click', function(e){
+  if(e.target.id==='modal-backdrop') closeModal();
+});
+
+function load(){
+  document.getElementById('app').innerHTML = '<div class="loading">Loading your matches…</div>';
+  fetch(API_URL, { method: 'GET' })
+    .then(function(res){
+      return res.json().then(function(body){ return { ok: res.ok, body: body }; });
+    })
+    .then(function(r){
+      if(!r.ok || r.body.error){
+        throw new Error((r.body && r.body.message) || 'Request failed');
+      }
+      DATA = r.body;
+      render();
+    })
+    .catch(function(err){
+      document.getElementById('app').innerHTML = '<div class="fetcherr"><h2 style="font-family:Fraunces,serif;">Couldn\'t load live data</h2>'
+        + '<p>The page is fine — this just means the API call failed. Try Retry, or check the dashboard function logs if it keeps happening.</p>'
+        + '<pre>'+esc(err.message)+'</pre>'
+        + '<button class="refresh-btn" onclick="load()">Retry</button></div>';
+    });
+}
+
+load();
+</script>
+</body>
+</html>
