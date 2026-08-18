@@ -183,7 +183,7 @@ function applicationLabel(status){
 }
 function statusClass(status){ return String(status||'').replace(/_/g,'-'); }
 function commandFor(type,m){
-  if(type==='tailor') return 'Tailor Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+'. Use the production Phase 2 tailoring workflow and verified career knowledge base.';
+  if(type==='tailor') return 'Prepare a Job Search OS tailoring proposal for job '+m.jobId+' — '+m.company+', '+m.title+'. Use the production Phase 2.1 approval-first workflow and verified career knowledge base. Do not generate or modify the CV yet. Show the fit and genuine gaps, exact section and bullet changes, achievement evidence for every claim, keywords to add or remove, and layout or page-count tradeoffs. Follow my saved layout preferences, including increased line spacing and a standalone AI-Built Products section. Wait for my explicit approval before generating the DOCX.';
   if(type==='interested') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as interested.';
   if(type==='applied') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as applied today.';
   if(type==='skipped') return 'Skip Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+'.';
@@ -232,7 +232,7 @@ function wireActions(root){
       var m=DATA.matches.filter(function(x){return x.jobId===el.getAttribute('data-job-id');})[0];
       if(m){
         var type=el.getAttribute('data-command');
-        var status={tailor:'tailoring',interested:'interested',applied:'applied',skipped:'skipped'}[type];
+        var status={tailor:'reviewing',interested:'interested',applied:'applied',skipped:'skipped'}[type];
         if(status){ saveLocalStatus(m.jobId,status); m.applicationStatus=status; m.applicationUpdatedAt=new Date().toISOString(); }
         copyText(commandFor(type,m));
         render();
@@ -275,7 +275,7 @@ function queueCard(m){
     + '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span></div>'
     + '<p>'+esc(m.location||'Location TBC')+' · '+esc(m.workArrangement||'Mode not disclosed')+'</p>'
     + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
-    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">'+(ready?'Retailor':'Continue tailoring')+'</button></div></article>';
+    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">'+(ready?'Plan a revision':'Review tailoring plan')+'</button></div></article>';
 }
 
 function render(){
@@ -294,8 +294,8 @@ function render(){
     + '<span>'+(d.lastRun ? 'Last search '+fmtRelative(d.lastRun.createdAt)+' · '+esc(d.lastRun.status) : 'No search runs yet')+'</span>'
     + '<button class="refresh-btn hdr-refresh" onclick="load()">Refresh</button></div>'
     + '<div class="daily-strip"><div class="daily-step"><span class="daily-n">1</span><div><strong>Choose a role</strong><span>Start with Apply First</span></div></div>'
-    + '<div class="daily-step"><span class="daily-n">2</span><div><strong>Tailor truthfully</strong><span>Copy the command into ChatGPT Work</span></div></div>'
-    + '<div class="daily-step"><span class="daily-n">3</span><div><strong>Apply & track</strong><span>Submit manually, then copy a status command</span></div></div></div></header>';
+    + '<div class="daily-step"><span class="daily-n">2</span><div><strong>Review the proposal</strong><span>See every content and layout change first</span></div></div>'
+    + '<div class="daily-step"><span class="daily-n">3</span><div><strong>Approve, generate & apply</strong><span>No DOCX is created before your approval</span></div></div></div></header>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">Apply first</p><h2>Today\'s best five</h2>'
     + '<p class="section-note">Ranked by stored match score, with a small presentation-only boost for hybrid work, disclosed compensation ≥ ₹35L, and postings found in the last 7 days — the stored score itself never changes.</p></div>'
@@ -306,9 +306,9 @@ function render(){
     var ar=/ready_to_apply|shortlisted/.test(a.applicationStatus||'')?0:1, br=/ready_to_apply|shortlisted/.test(b.applicationStatus||'')?0:1;
     return ar-br || (b.overallScore||0)-(a.overallScore||0);
   });
-  html += '<section class="section"><div class="section-head"><p class="eyebrow">Application queue</p><h2>Needs tailoring / ready</h2>'
-    + '<p class="section-note">Convenience markers stay only in this browser. Use the copied ChatGPT command to update the private Supabase record securely.</p></div>'
-    + (queue.length ? '<div class="queue-grid">'+queue.map(queueCard).join('')+'</div>' : '<p class="empty">Nothing is waiting. Choose a role from Apply First and click Tailor CV.</p>')
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Application queue</p><h2>Proposals / tailoring / ready</h2>'
+    + '<p class="section-note">Tailor CV now starts with a reviewable proposal. A new DOCX is generated only after you approve the changes. Convenience markers stay only in this browser.</p></div>'
+    + (queue.length ? '<div class="queue-grid">'+queue.map(queueCard).join('')+'</div>' : '<p class="empty">Nothing is waiting. Choose a role from Apply First and click Tailor CV to review a proposal.</p>')
     + '</section>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">New since last search</p>'
