@@ -11,6 +11,7 @@
 :root{
   --cream:#F6F1E7; --card:#FFFFFF; --ink:#221D17; --ink-soft:#5B5142;
   --teal:#1F4E49; --teal-deep:#12332F; --clay:#B5622F; --gold:#B8862F; --line:#E4DCC9;
+  --sage:#DCE9E5; --sand:#F1E3CC;
 }
 *{box-sizing:border-box;}
 body{margin:0; background:var(--cream); color:var(--ink); font-family:'Inter',-apple-system,system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
@@ -27,6 +28,11 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 .dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
 .dot-ok{background:var(--teal);} .dot-warn{background:var(--clay);}
 .hdr-refresh{margin-left:auto; opacity:0.7;}
+.daily-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:0.65rem; margin-top:1.2rem;}
+.daily-step{background:rgba(255,255,255,0.58); border:1px solid var(--line); border-radius:10px; padding:0.65rem 0.75rem; display:flex; gap:0.55rem; align-items:center;}
+.daily-n{width:1.55rem; height:1.55rem; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--teal); color:#fff; font-size:0.72rem; font-weight:700;}
+.daily-step strong{display:block; font-size:0.8rem;}
+.daily-step span:last-child{display:block; color:var(--ink-soft); font-size:0.72rem; margin-top:0.1rem;}
 .section{margin-bottom:3rem;}
 .section-head{margin-bottom:1.25rem;}
 .section-head h2{font-size:1.5rem;}
@@ -45,10 +51,23 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 .af-comp{font-weight:600; color:var(--teal-deep); margin:0; font-size:0.92rem;}
 .af-why,.af-watch{font-size:0.82rem; margin:0; line-height:1.4;}
 .af-watch{color:var(--clay);}
-.af-actions{display:flex; gap:0.5rem; margin-top:0.4rem;}
+.af-actions{display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.4rem;}
 .btn-detail{flex:1; background:transparent; border:1px solid var(--teal); color:var(--teal-deep); border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:600;}
 .btn-apply{flex:1; background:var(--teal); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; text-align:center; text-decoration:none; font-weight:600;}
+.btn-tailor{flex:1; background:var(--clay); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:700; font-family:inherit; white-space:nowrap;}
+.btn-command{background:var(--card); color:var(--teal-deep); border:1px solid var(--line); border-radius:8px; padding:0.55rem 0.7rem; font-size:0.78rem; cursor:pointer; font-weight:600; font-family:inherit;}
 .ring-text{font-size:0.95rem; font-weight:700; fill:var(--ink); font-family:'Inter',sans-serif;}
+
+.queue-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:0.75rem;}
+.queue-card{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--clay); border-radius:12px; padding:0.9rem;}
+.queue-card.ready{border-left-color:var(--teal);}
+.queue-top{display:flex; justify-content:space-between; gap:0.75rem; align-items:flex-start;}
+.queue-card h3{font-size:1rem; margin-top:0.15rem;}
+.queue-card p{font-size:0.78rem; color:var(--ink-soft); margin:0.25rem 0 0.65rem;}
+.app-status{display:inline-block; border-radius:999px; padding:0.18rem 0.5rem; font-size:0.68rem; font-weight:700; white-space:nowrap; background:var(--sand); color:#7A4E16;}
+.app-status.ready-to-apply,.app-status.shortlisted{background:var(--sage); color:var(--teal-deep);}
+.app-status.applied,.app-status.interview,.app-status.interviewing,.app-status.offer{background:#D8E4F2; color:#264B73;}
+.app-status.skipped,.app-status.rejected,.app-status.withdrawn{background:#EEE8DE; color:var(--ink-soft);}
 
 .new-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.75rem;}
 .compact-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0.75rem; display:flex; gap:0.7rem; align-items:center; cursor:pointer;}
@@ -102,8 +121,12 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 .modal-section h4{font-size:0.78rem; text-transform:uppercase; color:var(--ink-soft); margin:0 0 0.3rem;}
 .modal-close{float:right; background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--ink-soft);}
 .modal-actions{margin-top:1.2rem;}
+.command-row{display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.75rem;}
+.copy-toast{position:fixed; left:50%; bottom:1.5rem; transform:translate(-50%,12px); background:var(--teal-deep); color:#fff; border-radius:999px; padding:0.65rem 1rem; font-size:0.8rem; opacity:0; pointer-events:none; transition:0.2s ease; z-index:90; box-shadow:0 8px 30px rgba(0,0,0,0.2);}
+.copy-toast.show{opacity:1; transform:translate(-50%,0);}
 
 @media (max-width:720px){
+  .daily-strip{grid-template-columns:1fr;}
   .table-row{grid-template-columns:1fr; gap:0.2rem;}
   .runs-row{grid-template-columns:1fr 1fr; row-gap:0.2rem;}
   .modal-grid{grid-template-columns:1fr;}
@@ -118,11 +141,13 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal" id="modal"></div>
 </div>
+<div class="copy-toast" id="copy-toast" role="status" aria-live="polite">Copied — paste into ChatGPT Work</div>
 
 <script>
 const API_URL = "https://ehifvraqlgqyhjgrksiy.supabase.co/functions/v1/dashboard";
 let DATA = null;
 let state = { filter: 'all', company: '', location: '', sort: 'score' };
+const LOCAL_STATUS_KEY = 'job-search-os-v1-statuses';
 
 function esc(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -151,6 +176,71 @@ function fmtComp(m){
   return cur+v+'L';
 }
 function pillClass(cat){ return 'pill pill-'+(cat||'moderate'); }
+function applicationLabel(status){
+  if(!status) return '';
+  var labels={new:'New',interested:'Interested',reviewing:'Reviewing',tailoring:'Tailoring',shortlisted:'Shortlisted',ready_to_apply:'Ready to apply',applied:'Applied',assessment:'Assessment',interview:'Interview',interviewing:'Interviewing',offer:'Offer',accepted:'Accepted',rejected:'Rejected',withdrawn:'Withdrawn',on_hold:'On hold',skipped:'Skipped'};
+  return labels[status] || status.replace(/_/g,' ');
+}
+function statusClass(status){ return String(status||'').replace(/_/g,'-'); }
+function commandFor(type,m){
+  if(type==='tailor') return 'Tailor Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+'. Use the production Phase 2 tailoring workflow and verified career knowledge base.';
+  if(type==='interested') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as interested.';
+  if(type==='applied') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as applied today.';
+  if(type==='skipped') return 'Skip Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+'.';
+  return '';
+}
+function showToast(message){
+  var toast=document.getElementById('copy-toast');
+  toast.textContent=message||'Copied — paste into ChatGPT Work';
+  toast.classList.add('show');
+  window.clearTimeout(showToast.timer);
+  showToast.timer=window.setTimeout(function(){ toast.classList.remove('show'); },2200);
+}
+function copyText(text){
+  var fallback=function(){
+    var area=document.createElement('textarea'); area.value=text; area.setAttribute('readonly',''); area.style.position='fixed'; area.style.opacity='0';
+    document.body.appendChild(area); area.select(); document.execCommand('copy'); document.body.removeChild(area); showToast();
+  };
+  if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(text).then(function(){showToast();}).catch(fallback); }
+  else fallback();
+}
+function readLocalStatuses(){
+  try { return JSON.parse(localStorage.getItem(LOCAL_STATUS_KEY)||'{}') || {}; }
+  catch(_e){ return {}; }
+}
+function saveLocalStatus(jobId,status){
+  try {
+    var statuses=readLocalStatuses();
+    statuses[jobId]={status:status,updatedAt:new Date().toISOString()};
+    localStorage.setItem(LOCAL_STATUS_KEY,JSON.stringify(statuses));
+  } catch(_e){}
+}
+function applyLocalStatuses(data){
+  var statuses=readLocalStatuses();
+  data.matches.forEach(function(m){
+    var local=statuses[m.jobId];
+    if(local){ m.applicationStatus=local.status; m.applicationUpdatedAt=local.updatedAt; }
+  });
+}
+function wireActions(root){
+  Array.prototype.forEach.call(root.querySelectorAll('[data-open]'), function(el){
+    el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('[data-command]'), function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var m=DATA.matches.filter(function(x){return x.jobId===el.getAttribute('data-job-id');})[0];
+      if(m){
+        var type=el.getAttribute('data-command');
+        var status={tailor:'tailoring',interested:'interested',applied:'applied',skipped:'skipped'}[type];
+        if(status){ saveLocalStatus(m.jobId,status); m.applicationStatus=status; m.applicationUpdatedAt=new Date().toISOString(); }
+        copyText(commandFor(type,m));
+        render();
+        if(document.getElementById('modal-backdrop').classList.contains('open')) openModal(m.matchId);
+      }
+    });
+  });
+}
 
 function scoreRing(score, size){
   size = size || 56;
@@ -169,13 +259,23 @@ function applyFirstCard(m){
     + '<p class="af-comp">'+esc(fmtComp(m))+'</p>'
     + (m.strengths.length ? '<p class="af-why"><strong>Why it fits:</strong> '+esc(m.strengths[0])+'</p>' : '')
     + (m.gaps.length ? '<p class="af-watch"><strong>Watch for:</strong> '+esc(m.gaps[0])+'</p>' : '')
+    + (m.applicationStatus ? '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>' : '')
     + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
+    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">Tailor CV</button>'
     + (m.applicationUrl ? '<a class="btn-apply" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '')
     + '</div></article>';
 }
 function compactCard(m){
   return '<article class="compact-card" data-open="'+m.matchId+'">'+scoreRing(m.overallScore,44)
     + '<div><p class="compact-company">'+esc(m.company)+'</p><p class="compact-title">'+esc(m.title)+'</p></div></article>';
+}
+function queueCard(m){
+  var ready=/ready_to_apply|shortlisted/.test(m.applicationStatus||'');
+  return '<article class="queue-card '+(ready?'ready':'')+'"><div class="queue-top"><div><p class="af-company">'+esc(m.company)+'</p><h3>'+esc(m.title)+'</h3></div>'
+    + '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span></div>'
+    + '<p>'+esc(m.location||'Location TBC')+' · '+esc(m.workArrangement||'Mode not disclosed')+'</p>'
+    + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
+    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">'+(ready?'Retailor':'Continue tailoring')+'</button></div></article>';
 }
 
 function render(){
@@ -192,11 +292,24 @@ function render(){
     + '</div>'
     + '<div class="hdr-meta"><span class="dot '+(d.lastRun && d.lastRun.status==='completed' ? 'dot-ok':'dot-warn')+'"></span>'
     + '<span>'+(d.lastRun ? 'Last search '+fmtRelative(d.lastRun.createdAt)+' · '+esc(d.lastRun.status) : 'No search runs yet')+'</span>'
-    + '<button class="refresh-btn hdr-refresh" onclick="load()">Refresh</button></div></header>';
+    + '<button class="refresh-btn hdr-refresh" onclick="load()">Refresh</button></div>'
+    + '<div class="daily-strip"><div class="daily-step"><span class="daily-n">1</span><div><strong>Choose a role</strong><span>Start with Apply First</span></div></div>'
+    + '<div class="daily-step"><span class="daily-n">2</span><div><strong>Tailor truthfully</strong><span>Copy the command into ChatGPT Work</span></div></div>'
+    + '<div class="daily-step"><span class="daily-n">3</span><div><strong>Apply & track</strong><span>Submit manually, then copy a status command</span></div></div></div></header>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">Apply first</p><h2>Today\'s best five</h2>'
     + '<p class="section-note">Ranked by stored match score, with a small presentation-only boost for hybrid work, disclosed compensation ≥ ₹35L, and postings found in the last 7 days — the stored score itself never changes.</p></div>'
     + '<div class="apply-first-grid">' + (d.applyFirst.length ? d.applyFirst.map(applyFirstCard).join('') : '<p class="empty">No active matches yet.</p>') + '</div></section>';
+
+  var queue=d.matches.filter(function(m){ return /^(interested|reviewing|tailoring|shortlisted|ready_to_apply)$/.test(m.applicationStatus||''); });
+  queue.sort(function(a,b){
+    var ar=/ready_to_apply|shortlisted/.test(a.applicationStatus||'')?0:1, br=/ready_to_apply|shortlisted/.test(b.applicationStatus||'')?0:1;
+    return ar-br || (b.overallScore||0)-(a.overallScore||0);
+  });
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Application queue</p><h2>Needs tailoring / ready</h2>'
+    + '<p class="section-note">Convenience markers stay only in this browser. Use the copied ChatGPT command to update the private Supabase record securely.</p></div>'
+    + (queue.length ? '<div class="queue-grid">'+queue.map(queueCard).join('')+'</div>' : '<p class="empty">Nothing is waiting. Choose a role from Apply First and click Tailor CV.</p>')
+    + '</section>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">New since last search</p>'
     + '<h2>'+(d.newCount>0 ? d.newCount+' new role'+(d.newCount===1?'':'s') : 'No new roles in the latest search')+'</h2></div>'
@@ -253,9 +366,7 @@ function render(){
       renderTable();
     });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function(el){
-    el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
-  });
+  wireActions(app);
 
   renderTable();
 }
@@ -301,7 +412,8 @@ function renderTable(){
   var html = '<div class="table-row table-head"><span>Role</span><span>Location</span><span>Mode</span><span>Compensation</span><span>Discovered</span><span>Score</span></div>';
   rows.forEach(function(m){
     html += '<div class="table-row" data-open="'+m.matchId+'">'
-      + '<div><div class="t-role">'+esc(m.title)+(m.isNew?'<span class="new-badge">NEW</span>':'')+'</div><div class="t-company">'+esc(m.company)+'</div></div>'
+      + '<div><div class="t-role">'+esc(m.title)+(m.isNew?'<span class="new-badge">NEW</span>':'')+'</div><div class="t-company">'+esc(m.company)
+      + (m.applicationStatus?' · <span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>':'')+'</div></div>'
       + '<div>'+esc(m.location||'—')+'</div>'
       + '<div>'+esc(m.workArrangement||'—')+'</div>'
       + '<div>'+esc(fmtComp(m))+'</div>'
@@ -311,9 +423,7 @@ function renderTable(){
   });
   if(rows.length===0) html += '<p class="empty">No matches for this filter combination.</p>';
   wrap.innerHTML = html;
-  Array.prototype.forEach.call(wrap.querySelectorAll('[data-open]'), function(el){
-    el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
-  });
+  wireActions(wrap);
 }
 
 function openModal(matchId){
@@ -333,15 +443,21 @@ function openModal(matchId){
     + '<div><dt>Discovered</dt><dd>'+fmtDate(m.discoveredAt)+'</dd></div>'
     + '<div><dt>Source</dt><dd>'+esc(m.source||'—')+'</dd></div>'
     + '<div><dt>Status</dt><dd>'+(m.isActive?'Active':'Inactive')+'</dd></div>'
+    + '<div><dt>Application</dt><dd>'+(m.applicationStatus?'<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>':'Not started')+'</dd></div>'
     + '</dl>'
     + (m.strengths.length ? '<div class="modal-section"><h4>Why it fits</h4><p>'+m.strengths.map(esc).join(' · ')+'</p></div>' : '')
     + (m.gaps.length ? '<div class="modal-section"><h4>Watch out for</h4><p>'+m.gaps.map(esc).join(' · ')+'</p></div>' : '')
     + (m.explanation ? '<div class="modal-section"><h4>Explanation</h4><p>'+esc(m.explanation)+'</p></div>' : '')
     + '<div class="modal-actions">'
+    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">Tailor CV</button> '
     + (m.applicationUrl ? '<a class="btn-apply" style="display:inline-block; padding:0.6rem 1.2rem;" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '<span style="color:var(--ink-soft); font-size:0.85rem;">No application link captured</span>')
+    + '<div class="command-row"><button class="btn-command" data-command="interested" data-job-id="'+m.jobId+'">Copy: Mark interested</button>'
+    + '<button class="btn-command" data-command="applied" data-job-id="'+m.jobId+'">Copy: Mark applied today</button>'
+    + '<button class="btn-command" data-command="skipped" data-job-id="'+m.jobId+'">Copy: Skip</button></div>'
     + '</div>';
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('modal-close').addEventListener('click', closeModal);
+  wireActions(modal);
 }
 function closeModal(){ document.getElementById('modal-backdrop').classList.remove('open'); }
 document.getElementById('modal-backdrop').addEventListener('click', function(e){
@@ -359,6 +475,7 @@ function load(){
         throw new Error((r.body && r.body.message) || 'Request failed');
       }
       DATA = r.body;
+      applyLocalStatuses(DATA);
       render();
     })
     .catch(function(err){
