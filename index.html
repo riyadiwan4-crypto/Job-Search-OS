@@ -54,7 +54,7 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 .af-actions{display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.4rem;}
 .btn-detail{flex:1; background:transparent; border:1px solid var(--teal); color:var(--teal-deep); border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:600;}
 .btn-apply{flex:1; background:var(--teal); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; text-align:center; text-decoration:none; font-weight:600;}
-.btn-tailor{flex:1; background:var(--clay); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:700; font-family:inherit; white-space:nowrap;}
+.btn-track{flex:1; background:var(--clay); color:#fff; border:none; border-radius:8px; padding:0.5rem; font-size:0.82rem; cursor:pointer; font-weight:700; font-family:inherit; white-space:nowrap;}
 .btn-command{background:var(--card); color:var(--teal-deep); border:1px solid var(--line); border-radius:8px; padding:0.55rem 0.7rem; font-size:0.78rem; cursor:pointer; font-weight:600; font-family:inherit;}
 .ring-text{font-size:0.95rem; font-weight:700; fill:var(--ink); font-family:'Inter',sans-serif;}
 
@@ -67,7 +67,21 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600; letter
 .app-status{display:inline-block; border-radius:999px; padding:0.18rem 0.5rem; font-size:0.68rem; font-weight:700; white-space:nowrap; background:var(--sand); color:#7A4E16;}
 .app-status.ready-to-apply,.app-status.shortlisted{background:var(--sage); color:var(--teal-deep);}
 .app-status.applied,.app-status.interview,.app-status.interviewing,.app-status.offer{background:#D8E4F2; color:#264B73;}
+.app-status.accepted{background:#CFE8D7; color:#205A34;}
+.app-status.interested,.app-status.on-hold,.app-status.assessment{background:var(--sand); color:#7A4E16;}
 .app-status.skipped,.app-status.rejected,.app-status.withdrawn{background:#EEE8DE; color:var(--ink-soft);}
+.tracker-remark{font-size:0.78rem; color:var(--ink-soft); line-height:1.4; margin:0.45rem 0;}
+.tracker-toolbar{display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; margin-top:0.8rem;}
+.tracker-form{background:#FAF8F2; border:1px solid var(--line); border-radius:12px; padding:1rem; margin-top:1rem;}
+.tracker-form h4{font-size:0.78rem; text-transform:uppercase; color:var(--ink-soft); margin:0 0 0.65rem;}
+.tracker-form label{display:block; font-size:0.74rem; font-weight:700; color:var(--ink-soft); margin:0.65rem 0 0.25rem;}
+.tracker-form select,.tracker-form textarea{width:100%; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px; padding:0.65rem; font:inherit; font-size:0.84rem;}
+.tracker-form textarea{min-height:84px; resize:vertical; line-height:1.45;}
+.tracker-help{font-size:0.72rem; color:var(--ink-soft); line-height:1.4; margin:0.55rem 0 0;}
+.tracker-history{margin-top:1rem;}
+.history-item{border-left:3px solid var(--line); padding:0.1rem 0 0.65rem 0.75rem; margin-bottom:0.55rem;}
+.history-item p{font-size:0.8rem; margin:0.2rem 0; line-height:1.4;}
+.history-meta{font-size:0.7rem; color:var(--ink-soft);}
 
 .new-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.75rem;}
 .compact-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0.75rem; display:flex; gap:0.7rem; align-items:center; cursor:pointer;}
@@ -177,17 +191,30 @@ function fmtComp(m){
 }
 function pillClass(cat){ return 'pill pill-'+(cat||'moderate'); }
 function applicationLabel(status){
-  if(!status) return '';
-  var labels={new:'New',interested:'Interested',reviewing:'Reviewing',tailoring:'Tailoring',shortlisted:'Shortlisted',ready_to_apply:'Ready to apply',applied:'Applied',assessment:'Assessment',interview:'Interview',interviewing:'Interviewing',offer:'Offer',accepted:'Accepted',rejected:'Rejected',withdrawn:'Withdrawn',on_hold:'On hold',skipped:'Skipped'};
+  if(!status) return 'No action';
+  var labels={new:'No action',interested:'Interested',reviewing:'Interested',tailoring:'Interested',shortlisted:'Shortlisted',ready_to_apply:'Interested',applied:'Applied',assessment:'Assessment',interview:'Interview',interviewing:'Interview',offer:'Offer',accepted:'Accepted',rejected:'Rejected by company',withdrawn:'Withdrawn',on_hold:'Waiting / follow-up',skipped:'Not pursuing'};
   return labels[status] || status.replace(/_/g,' ');
 }
 function statusClass(status){ return String(status||'').replace(/_/g,'-'); }
-function commandFor(type,m){
-  if(type==='tailor') return 'Prepare a Job Search OS tailoring proposal for job '+m.jobId+' — '+m.company+', '+m.title+'. Use the production Phase 2.1 approval-first workflow and verified career knowledge base. Do not generate or modify the CV yet. Show the fit and genuine gaps, exact section and bullet changes, achievement evidence for every claim, keywords to add or remove, and layout or page-count tradeoffs. Follow my saved layout preferences, including increased line spacing and a standalone AI-Built Products section. Wait for my explicit approval before generating the DOCX.';
-  if(type==='interested') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as interested.';
-  if(type==='applied') return 'Mark Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+' as applied today.';
-  if(type==='skipped') return 'Skip Job Search OS job '+m.jobId+' — '+m.company+', '+m.title+'.';
-  return '';
+var TRACKER_STATUSES=[
+  ['new','No action'],['interested','Interested'],['applied','Applied'],
+  ['on_hold','Waiting / follow-up'],['assessment','Assessment'],['interview','Interview'],
+  ['offer','Offer'],['accepted','Accepted'],['rejected','Rejected by company'],
+  ['skipped','Not pursuing'],['withdrawn','Withdrawn']
+];
+function normalizeTrackerStatus(status){
+  if(/^(reviewing|tailoring|ready_to_apply|shortlisted)$/.test(status||'')) return 'interested';
+  if(status==='interviewing') return 'interview';
+  return status||'new';
+}
+function eventId(){
+  if(window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0, v=c==='x'?r:(r&3|8); return v.toString(16);
+  });
+}
+function trackerCommand(m,event){
+  return 'Sync this Job Search OS application update to Supabase. Upsert the application for job '+m.jobId+' — '+m.company+', '+m.title+'. Set the application to the latest status "'+event.status+'" and append one idempotent application_updates history event using this JSON: '+JSON.stringify(event)+'. If the new status is applied and applied_at is empty, set applied_at to event_at. Preserve an existing applied_at for later stages. Do not change the job, match score, or search data.';
 }
 function showToast(message){
   var toast=document.getElementById('copy-toast');
@@ -205,40 +232,70 @@ function copyText(text){
   else fallback();
 }
 function readLocalStatuses(){
-  try { return JSON.parse(localStorage.getItem(LOCAL_STATUS_KEY)||'{}') || {}; }
+  try {
+    var statuses=JSON.parse(localStorage.getItem(LOCAL_STATUS_KEY)||'{}') || {};
+    Object.keys(statuses).forEach(function(jobId){
+      var record=statuses[jobId]||{};
+      record.status=normalizeTrackerStatus(record.status);
+      record.history=Array.isArray(record.history)?record.history:[];
+      statuses[jobId]=record;
+    });
+    localStorage.setItem(LOCAL_STATUS_KEY,JSON.stringify(statuses));
+    return statuses;
+  }
   catch(_e){ return {}; }
 }
-function saveLocalStatus(jobId,status){
+function saveTrackerUpdate(m,status,remark){
   try {
     var statuses=readLocalStatuses();
-    statuses[jobId]={status:status,updatedAt:new Date().toISOString()};
+    var existing=statuses[m.jobId]||{status:'new',history:[]};
+    var event={
+      id:eventId(),job_id:m.jobId,previous_status:normalizeTrackerStatus(existing.status),
+      status:normalizeTrackerStatus(status),remark:String(remark||'').trim()||null,
+      event_at:new Date().toISOString(),source:'portal_sync'
+    };
+    existing.status=event.status;
+    existing.updatedAt=event.event_at;
+    existing.remark=event.remark;
+    existing.history=(existing.history||[]).concat([event]);
+    statuses[m.jobId]=existing;
     localStorage.setItem(LOCAL_STATUS_KEY,JSON.stringify(statuses));
+    m.applicationStatus=existing.status;
+    m.applicationUpdatedAt=existing.updatedAt;
+    m.applicationRemark=existing.remark;
+    m.applicationHistory=existing.history;
+    copyText(trackerCommand(m,event));
+    return event;
   } catch(_e){}
 }
 function applyLocalStatuses(data){
   var statuses=readLocalStatuses();
   data.matches.forEach(function(m){
     var local=statuses[m.jobId];
-    if(local){ m.applicationStatus=local.status; m.applicationUpdatedAt=local.updatedAt; }
+    if(local){
+      m.applicationStatus=normalizeTrackerStatus(local.status);
+      m.applicationUpdatedAt=local.updatedAt;
+      m.applicationRemark=local.remark||'';
+      m.applicationHistory=local.history||[];
+    } else {
+      m.applicationStatus='new'; m.applicationHistory=[]; m.applicationRemark='';
+    }
   });
+}
+function copyAllTrackerUpdates(){
+  var statuses=readLocalStatuses(), events=[];
+  Object.keys(statuses).forEach(function(jobId){
+    (statuses[jobId].history||[]).forEach(function(event){ events.push(event); });
+  });
+  if(!events.length){ showToast('No tracker updates to copy'); return; }
+  copyText('Sync these Job Search OS tracker updates to Supabase. Upsert applications by job_id, set each application to its latest event status, and insert application_updates events idempotently by event id. For applied events, set applied_at from event_at only when it is empty; preserve applied_at through later stages. Do not modify jobs, matches, or search data. Updates JSON: '+JSON.stringify(events));
 }
 function wireActions(root){
   Array.prototype.forEach.call(root.querySelectorAll('[data-open]'), function(el){
     el.addEventListener('click', function(){ openModal(el.getAttribute('data-open')); });
   });
-  Array.prototype.forEach.call(root.querySelectorAll('[data-command]'), function(el){
-    el.addEventListener('click', function(e){
-      e.preventDefault(); e.stopPropagation();
-      var m=DATA.matches.filter(function(x){return x.jobId===el.getAttribute('data-job-id');})[0];
-      if(m){
-        var type=el.getAttribute('data-command');
-        var status={tailor:'reviewing',interested:'interested',applied:'applied',skipped:'skipped'}[type];
-        if(status){ saveLocalStatus(m.jobId,status); m.applicationStatus=status; m.applicationUpdatedAt=new Date().toISOString(); }
-        copyText(commandFor(type,m));
-        render();
-        if(document.getElementById('modal-backdrop').classList.contains('open')) openModal(m.matchId);
-      }
-    });
+  Array.prototype.forEach.call(root.querySelectorAll('[data-track]'), function(el){
+    el.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); openModal(el.getAttribute('data-track')); });
   });
 }
 
@@ -259,9 +316,9 @@ function applyFirstCard(m){
     + '<p class="af-comp">'+esc(fmtComp(m))+'</p>'
     + (m.strengths.length ? '<p class="af-why"><strong>Why it fits:</strong> '+esc(m.strengths[0])+'</p>' : '')
     + (m.gaps.length ? '<p class="af-watch"><strong>Watch for:</strong> '+esc(m.gaps[0])+'</p>' : '')
-    + (m.applicationStatus ? '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>' : '')
+    + (m.applicationStatus && m.applicationStatus!=='new' ? '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>' : '')
     + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
-    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">Tailor CV</button>'
+    + '<button class="btn-track" data-track="'+m.matchId+'">Track status</button>'
     + (m.applicationUrl ? '<a class="btn-apply" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '')
     + '</div></article>';
 }
@@ -269,13 +326,13 @@ function compactCard(m){
   return '<article class="compact-card" data-open="'+m.matchId+'">'+scoreRing(m.overallScore,44)
     + '<div><p class="compact-company">'+esc(m.company)+'</p><p class="compact-title">'+esc(m.title)+'</p></div></article>';
 }
-function queueCard(m){
-  var ready=/ready_to_apply|shortlisted/.test(m.applicationStatus||'');
-  return '<article class="queue-card '+(ready?'ready':'')+'"><div class="queue-top"><div><p class="af-company">'+esc(m.company)+'</p><h3>'+esc(m.title)+'</h3></div>'
+function trackerCard(m){
+  var positive=/offer|accepted/.test(m.applicationStatus||'');
+  return '<article class="queue-card '+(positive?'ready':'')+'"><div class="queue-top"><div><p class="af-company">'+esc(m.company)+'</p><h3>'+esc(m.title)+'</h3></div>'
     + '<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span></div>'
     + '<p>'+esc(m.location||'Location TBC')+' · '+esc(m.workArrangement||'Mode not disclosed')+'</p>'
-    + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">Details</button>'
-    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">'+(ready?'Plan a revision':'Review tailoring plan')+'</button></div></article>';
+    + (m.applicationRemark?'<p class="tracker-remark"><strong>Latest:</strong> '+esc(m.applicationRemark)+'</p>':'')
+    + '<div class="af-actions"><button class="btn-detail" data-open="'+m.matchId+'">View & update</button></div></article>';
 }
 
 function render(){
@@ -293,22 +350,25 @@ function render(){
     + '<div class="hdr-meta"><span class="dot '+(d.lastRun && d.lastRun.status==='completed' ? 'dot-ok':'dot-warn')+'"></span>'
     + '<span>'+(d.lastRun ? 'Last search '+fmtRelative(d.lastRun.createdAt)+' · '+esc(d.lastRun.status) : 'No search runs yet')+'</span>'
     + '<button class="refresh-btn hdr-refresh" onclick="load()">Refresh</button></div>'
-    + '<div class="daily-strip"><div class="daily-step"><span class="daily-n">1</span><div><strong>Choose a role</strong><span>Start with Apply First</span></div></div>'
-    + '<div class="daily-step"><span class="daily-n">2</span><div><strong>Review the proposal</strong><span>See every content and layout change first</span></div></div>'
-    + '<div class="daily-step"><span class="daily-n">3</span><div><strong>Approve, generate & apply</strong><span>No DOCX is created before your approval</span></div></div></div></header>';
+    + '<div class="daily-strip"><div class="daily-step"><span class="daily-n">1</span><div><strong>Review new jobs</strong><span>Start with Apply First</span></div></div>'
+    + '<div class="daily-step"><span class="daily-n">2</span><div><strong>Apply or decline</strong><span>Record the decision and a remark</span></div></div>'
+    + '<div class="daily-step"><span class="daily-n">3</span><div><strong>Track progress</strong><span>Keep every interview and outcome update</span></div></div></div></header>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">Apply first</p><h2>Today\'s best five</h2>'
     + '<p class="section-note">Ranked by stored match score, with a small presentation-only boost for hybrid work, disclosed compensation ≥ ₹35L, and postings found in the last 7 days — the stored score itself never changes.</p></div>'
     + '<div class="apply-first-grid">' + (d.applyFirst.length ? d.applyFirst.map(applyFirstCard).join('') : '<p class="empty">No active matches yet.</p>') + '</div></section>';
 
-  var queue=d.matches.filter(function(m){ return /^(interested|reviewing|tailoring|shortlisted|ready_to_apply)$/.test(m.applicationStatus||''); });
+  var queue=d.matches.filter(function(m){ return m.applicationStatus && m.applicationStatus!=='new'; });
+  var statusOrder={interview:0,assessment:1,offer:2,applied:3,on_hold:4,interested:5,accepted:6,rejected:7,skipped:8,withdrawn:9};
   queue.sort(function(a,b){
-    var ar=/ready_to_apply|shortlisted/.test(a.applicationStatus||'')?0:1, br=/ready_to_apply|shortlisted/.test(b.applicationStatus||'')?0:1;
-    return ar-br || (b.overallScore||0)-(a.overallScore||0);
+    var ao=Object.prototype.hasOwnProperty.call(statusOrder,a.applicationStatus)?statusOrder[a.applicationStatus]:20;
+    var bo=Object.prototype.hasOwnProperty.call(statusOrder,b.applicationStatus)?statusOrder[b.applicationStatus]:20;
+    return ao-bo || (b.overallScore||0)-(a.overallScore||0);
   });
-  html += '<section class="section"><div class="section-head"><p class="eyebrow">Application queue</p><h2>Proposals / tailoring / ready</h2>'
-    + '<p class="section-note">Tailor CV now starts with a reviewable proposal. A new DOCX is generated only after you approve the changes. Convenience markers stay only in this browser.</p></div>'
-    + (queue.length ? '<div class="queue-grid">'+queue.map(queueCard).join('')+'</div>' : '<p class="empty">Nothing is waiting. Choose a role from Apply First and click Tailor CV to review a proposal.</p>')
+  html += '<section class="section"><div class="section-head"><p class="eyebrow">Application tracker</p><h2>Decisions and progress</h2>'
+    + '<p class="section-note">Status and remark history is saved in this browser immediately. Each update also copies a secure ChatGPT sync command for the private Supabase history.</p>'
+    + '<div class="tracker-toolbar"><span class="filter-note">'+queue.length+' tracked role'+(queue.length===1?'':'s')+'</span><button class="btn-command" id="copy-tracker-updates">Copy tracker history for Chat sync</button></div></div>'
+    + (queue.length ? '<div class="queue-grid">'+queue.map(trackerCard).join('')+'</div>' : '<p class="empty">No tracked roles yet. Open any job and record Interested, Applied, or Not pursuing.</p>')
     + '</section>';
 
   html += '<section class="section"><div class="section-head"><p class="eyebrow">New since last search</p>'
@@ -327,6 +387,11 @@ function render(){
     + '<button class="chip" data-filter="fintech">Fintech¹</button>'
     + '<button class="chip" data-filter="ai">AI¹</button>'
     + '<button class="chip" data-filter="new">New</button>'
+    + '<button class="chip" data-filter="no_action">No action</button>'
+    + '<button class="chip" data-filter="applied">Applied</button>'
+    + '<button class="chip" data-filter="interview">Interview</button>'
+    + '<button class="chip" data-filter="waiting">Waiting</button>'
+    + '<button class="chip" data-filter="closed">Closed</button>'
     + '<select class="chip select" id="company-filter"><option value="">All companies</option>'+d.companies.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select>'
     + '<select class="chip select" id="location-filter"><option value="">All locations</option>'+d.locations.map(function(l){return '<option value="'+esc(l)+'">'+esc(l)+'</option>';}).join('')+'</select>'
     + '<select class="chip select" id="sort-select"><option value="score">Sort: score</option><option value="newest">Sort: newest</option><option value="company">Sort: company</option><option value="comp">Sort: compensation</option></select>'
@@ -351,10 +416,11 @@ function render(){
     + '<div class="strategy-card muted"><h3>Manual queue</h3><p>Zepto / TalentRecruit — always approval-gated</p></div>'
     + '</div></section>';
 
-  html += '<footer class="ftr"><span>Live from Supabase — fetched fresh each time this page loads or you hit Refresh. No stored credentials in this page.</span></footer>';
+  html += '<footer class="ftr"><span>Job data loads live from Supabase. Tracker updates stay in this browser until you paste the copied sync command into ChatGPT. No stored credentials in this page.</span></footer>';
 
   app.innerHTML = html;
 
+  document.getElementById('copy-tracker-updates').addEventListener('click', copyAllTrackerUpdates);
   document.getElementById('company-filter').addEventListener('change', function(e){ state.company = e.target.value; renderTable(); });
   document.getElementById('location-filter').addEventListener('change', function(e){ state.location = e.target.value; renderTable(); });
   document.getElementById('sort-select').addEventListener('change', function(e){ state.sort = e.target.value; renderTable(); });
@@ -389,6 +455,11 @@ function applyFilters(){
       if(hay2.indexOf('ai')===-1) return false;
     }
     if(state.filter==='new' && !m.isNew) return false;
+    if(state.filter==='no_action' && normalizeTrackerStatus(m.applicationStatus)!=='new') return false;
+    if(state.filter==='applied' && normalizeTrackerStatus(m.applicationStatus)!=='applied') return false;
+    if(state.filter==='interview' && !/^(assessment|interview)$/.test(normalizeTrackerStatus(m.applicationStatus))) return false;
+    if(state.filter==='waiting' && normalizeTrackerStatus(m.applicationStatus)!=='on_hold') return false;
+    if(state.filter==='closed' && !/^(accepted|rejected|skipped|withdrawn)$/.test(normalizeTrackerStatus(m.applicationStatus))) return false;
     if(state.company && m.company!==state.company) return false;
     if(state.location && m.location!==state.location) return false;
     return true;
@@ -426,6 +497,20 @@ function renderTable(){
   wireActions(wrap);
 }
 
+function trackerOptions(current){
+  return TRACKER_STATUSES.map(function(item){
+    return '<option value="'+item[0]+'"'+(normalizeTrackerStatus(current)===item[0]?' selected':'')+'>'+item[1]+'</option>';
+  }).join('');
+}
+function trackerHistoryHtml(m){
+  var history=(m.applicationHistory||[]).slice().reverse();
+  if(!history.length) return '<p class="tracker-help">No status history in this browser yet.</p>';
+  return history.map(function(event){
+    return '<div class="history-item"><span class="app-status '+statusClass(event.status)+'">'+esc(applicationLabel(event.status))+'</span>'
+      + '<p>'+(event.remark?esc(event.remark):'<em>No remark added</em>')+'</p>'
+      + '<span class="history-meta">'+fmtDate(event.event_at)+' · '+esc(new Date(event.event_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}))+'</span></div>';
+  }).join('');
+}
 function openModal(matchId){
   var m = DATA.matches.filter(function(x){ return x.matchId===matchId; })[0];
   if(!m) return;
@@ -443,21 +528,27 @@ function openModal(matchId){
     + '<div><dt>Discovered</dt><dd>'+fmtDate(m.discoveredAt)+'</dd></div>'
     + '<div><dt>Source</dt><dd>'+esc(m.source||'—')+'</dd></div>'
     + '<div><dt>Status</dt><dd>'+(m.isActive?'Active':'Inactive')+'</dd></div>'
-    + '<div><dt>Application</dt><dd>'+(m.applicationStatus?'<span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span>':'Not started')+'</dd></div>'
+    + '<div><dt>Application</dt><dd><span class="app-status '+statusClass(m.applicationStatus)+'">'+esc(applicationLabel(m.applicationStatus))+'</span></dd></div>'
     + '</dl>'
     + (m.strengths.length ? '<div class="modal-section"><h4>Why it fits</h4><p>'+m.strengths.map(esc).join(' · ')+'</p></div>' : '')
     + (m.gaps.length ? '<div class="modal-section"><h4>Watch out for</h4><p>'+m.gaps.map(esc).join(' · ')+'</p></div>' : '')
     + (m.explanation ? '<div class="modal-section"><h4>Explanation</h4><p>'+esc(m.explanation)+'</p></div>' : '')
-    + '<div class="modal-actions">'
-    + '<button class="btn-tailor" data-command="tailor" data-job-id="'+m.jobId+'">Tailor CV</button> '
-    + (m.applicationUrl ? '<a class="btn-apply" style="display:inline-block; padding:0.6rem 1.2rem;" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Apply now</a>' : '<span style="color:var(--ink-soft); font-size:0.85rem;">No application link captured</span>')
-    + '<div class="command-row"><button class="btn-command" data-command="interested" data-job-id="'+m.jobId+'">Copy: Mark interested</button>'
-    + '<button class="btn-command" data-command="applied" data-job-id="'+m.jobId+'">Copy: Mark applied today</button>'
-    + '<button class="btn-command" data-command="skipped" data-job-id="'+m.jobId+'">Copy: Skip</button></div>'
-    + '</div>';
+    + '<div class="tracker-form"><h4>Update application tracker</h4>'
+    + '<label for="tracker-status">Status</label><select id="tracker-status">'+trackerOptions(m.applicationStatus)+'</select>'
+    + '<label for="tracker-remark">Remark</label><textarea id="tracker-remark" maxlength="5000" placeholder="Example: Applied through referral; recruiter said feedback should arrive next week."></textarea>'
+    + '<div class="af-actions"><button class="btn-track" id="tracker-save">Save update & copy sync command</button>'
+    + (m.applicationUrl ? '<a class="btn-apply" href="'+esc(m.applicationUrl)+'" target="_blank" rel="noopener">Open application</a>' : '')+'</div>'
+    + '<p class="tracker-help">The portal saves immediately in this browser. Paste the copied command into ChatGPT whenever you want the private Supabase history synchronized.</p></div>'
+    + '<div class="tracker-history"><h4>Update history</h4>'+trackerHistoryHtml(m)+'</div>';
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('modal-close').addEventListener('click', closeModal);
-  wireActions(modal);
+  document.getElementById('tracker-save').addEventListener('click', function(){
+    var status=document.getElementById('tracker-status').value;
+    var remark=document.getElementById('tracker-remark').value;
+    saveTrackerUpdate(m,status,remark);
+    render();
+    openModal(matchId);
+  });
 }
 function closeModal(){ document.getElementById('modal-backdrop').classList.remove('open'); }
 document.getElementById('modal-backdrop').addEventListener('click', function(e){
